@@ -15,8 +15,6 @@ import com.springboot.blog.entity.Role;
 import com.springboot.blog.entity.User;
 import com.springboot.blog.repository.UserRepository;
 
-import net.bytebuddy.asm.Advice.This;
-
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
@@ -44,7 +42,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 	private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Set<Role> roles) {
 		System.out.println(
 				"\n\n############### Inside the CustomUserDetailsService.mapRolesToAuthorities() method ###############\n\n");
-		System.out.println("\n\n###############\n roles: " + roles + "###############\n\n");
+		System.out.println("\n###############\n\n");
+		roles.forEach(role -> System.out.println(" role Id: " + role.getId() + "\n role name: " + role.getName()));
+		System.out.println("\n\n###############\n\n");
 		return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
 	}
 
