@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 //import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 //import org.springframework.security.core.userdetails.User;
 //import org.springframework.security.core.userdetails.UserDetails;
 //import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 //import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 import com.springboot.blog.security.CustomUserDetailsService;
+import com.springboot.blog.security.JwtAuthenticationEntryPoint;
 
 @Configuration
 @EnableWebSecurity
@@ -26,9 +28,14 @@ import com.springboot.blog.security.CustomUserDetailsService;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
-	private CustomUserDetailsService userDetailsService;
+	// To utilize User-Specific data for AuthenticationManagerBuilder
+	private CustomUserDetailsService customUserDetailsService;
+
+	@Autowired
+	private JwtAuthenticationEntryPoint authenticationEntryPoint;
 
 	@Bean
+	// To encode the password
 	PasswordEncoder passwordEncoder() {
 		System.out.println(
 				"\n\n############### Entered the overridden SecurityConfig.passwordEncoder() method ###############");
@@ -36,23 +43,32 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Override
+	// We override this method to configure the HttpSecurity as we wish
 	protected void configure(HttpSecurity http) throws Exception {
 
 		System.out.println(
 				"\n\n############### Entered the overridden SecurityConfig.configure(HttpSecurity) method ###############");
-		http.csrf().disable().authorizeRequests().antMatchers(HttpMethod.GET, "/api/**").permitAll()
-				.antMatchers("/api/auth/**").permitAll().anyRequest().authenticated().and().httpBasic();
+
+		http.csrf().disable().exceptionHandling().authenticationEntryPoint(authenticationEntryPoint).and()
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
+				.antMatchers(HttpMethod.GET, "/api/**").permitAll().antMatchers("/api/auth/**").permitAll().anyRequest()
+				.authenticated()/* .and().httpBasic() */;
+
 		System.out.println(
 				"\n\n############### Exiting the overridden SecurityConfig.configure(HttpSecurity) method ###############\n\n");
 
 	}
 
 	@Override
+	// To enable authentication using the details from Custom User Details
+	// Service and an encoded password
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
 		System.out.println(
 				"\n\n############### Entered the overridden SecurityConfig.configure(AuthenticationManagerBuilder) method ###############");
-		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+
+		auth.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
+
 		System.out.println(
 				"\n\n############### Exiting the overridden SecurityConfig.configure(AuthenticationManagerBuilder) method ###############");
 
@@ -60,6 +76,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	@Bean
+	// Overridden this method to expose the AuthenticationManager from
+	// configure(AuthenticationManagerBuilder) to be exposed as a Bean
 	public AuthenticationManager authenticationManagerBean() throws Exception {
 		System.out.println(
 				"\n\n############### Inside the overridden SecurityConfig.authenticationManagerBean() method ###############\n");

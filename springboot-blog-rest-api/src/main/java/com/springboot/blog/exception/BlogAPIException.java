@@ -2,6 +2,8 @@ package com.springboot.blog.exception;
 
 import org.springframework.http.HttpStatus;
 
+//Used to throw exception when the comment id used in the API is not related to the post id
+//Also used for com.springboot.blog.security.JwtTokenProvider.validateToken(String) to throw corresponding exceptions while validating the JWT(token)
 public class BlogAPIException extends RuntimeException {
 
 	private HttpStatus status;

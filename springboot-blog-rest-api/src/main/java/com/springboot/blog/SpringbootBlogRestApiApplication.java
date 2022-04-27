@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 public class SpringbootBlogRestApiApplication {
 
 	@Bean
+	// To map one object to another
 	public ModelMapper modelMapper() {
 		return new ModelMapper();
 	}

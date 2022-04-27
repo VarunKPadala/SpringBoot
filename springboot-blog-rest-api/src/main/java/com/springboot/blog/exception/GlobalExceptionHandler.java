@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.springboot.blog.payload.ErrorDetails;
 
-//To handle exceptions globally
+//To handle all exceptions globally in a single place
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 

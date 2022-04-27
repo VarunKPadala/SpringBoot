@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.springframework.http.HttpStatus;
 
+//DTO to pass the error details to user when there is an exception
 public class ErrorDetails {
 
 	private Date timestamp;
